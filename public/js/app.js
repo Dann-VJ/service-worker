@@ -1,8 +1,34 @@
-if(navigator.serviceWorker){
-    console.log('Service Worker Supported');
-    navigator.serviceWorker.register('/sw.js')
-        .then(() => console.log('Service Worker Registered'))
-        .catch((err) => console.log('Service Worker Not Registered', err));
-} else {
-    console.log('Service Worker Not Supported');
-}
+//Ciclo de vida del SW
+//1.- Install
+self.addEventListener('install', event => {
+    console.log('SW: Instalado ')
+    //Simular instalación de caches
+    const instalación = new Promise((resolve, reject) => {
+        setTimeout(() => {
+            console.log('Instalación terminada ')
+            self.skipWaiting()
+            resolve();
+        }, 1000);
+    })
+    event.waitUntil(instalación)
+})
+//2.- Activación
+self.addEventListener('activate', event => {
+    console.log('SW: Activado y controlado la app')
+})
+//3.- Fetch
+self.addEventListener('fetch', function (event) {
+
+    console.log('SW', event.request.url);
+    //Aplicar estrategias del cache
+    if (event.request.url.includes('https://fakestoreapi.com/products/')){
+       const resp = new Response({"ok": false, "mensaje": "Interceptado por el SW"}); 
+       event.respondWith(resp)
+    }
+});
+
+self.addEventListener('sync', event => {
+    console.log("Tenemos conexión!")
+    console.log(event)
+    console.log(event.tag)
+})  
